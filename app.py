@@ -60,7 +60,8 @@ for i in range(1, 11):
 fig = go.Figure()
 fig.add_trace(go.Bar(x=list(range(11)), y=flujo, name="Flujo Acumulado", 
                      marker_color=['red' if x < 0 else 'green' for x in flujo]))
-fig.update_layout(title="Recuperación de la inversión en 10 años", ylabel="COP $")
+#fig.update_layout(title="Recuperación de la inversión en 10 años", ylabel="COP $")
+fig.update_layout(title="Recuperación de la inversión en 10 años", yaxis_title="COP $", xaxis_title="Años")
 st.plotly_chart(fig, use_container_width=True)
 
 st.write("---")
