@@ -12,7 +12,7 @@ import plotly.graph_objects as go
     #</style>
     #""", unsafe_allow_html=True)
 
-st.set_page_config(page_title="SolarExpert Pro Colombia", layout="wide")
+st.set_page_config(page_title="SolarExpert Pro Colombia by Josejaime Padilla", layout="wide")
 
 # Estilo para forzar que las métricas se vean bien en modo claro y oscuro
 st.markdown("""
