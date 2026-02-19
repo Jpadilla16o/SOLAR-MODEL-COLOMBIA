@@ -147,5 +147,20 @@ fig_pie = go.Figure(data=[go.Pie(labels=labels, values=values, hole=.3, marker_c
 fig_pie.update_layout(title_text="Uso de la Energía Producida")
 st.plotly_chart(fig_pie, use_container_width=True)
 
+# --- SECCIÓN EDUCATIVA Y LEGAL ---
+st.markdown("---")
+with st.expander("📖 Glosario y Metodología (Haz clic para expandir)"):
+    st.write("""
+    - **kWp (Kilovatio Pico):** Es la potencia máxima que puede generar el sistema en condiciones ideales.
+    - **HSP (Horas Sol Pico):** Es la cantidad de horas de sol aprovechables al día. No es lo mismo que horas de luz día.
+    - **PR (Performance Ratio):** Factor de eficiencia que considera pérdidas por calor, suciedad y eficiencia del inversor (usamos 80%).
+    - **Ley 1715:** Marco legal en Colombia que permite deducir hasta el 50% de la inversión de tu declaración de renta.
+    """)
+
+st.warning("⚠️ **Nota Técnica:** Este es un diseño preliminar basado en modelos matemáticos. La viabilidad final depende de una visita técnica para verificar sombras, estado del tablero eléctrico y resistencia estructural real del techo.")
+
+# --- PIE DE PÁGINA ---
+st.markdown("<br><center>Desarrollado con ☀️ para el sector energético colombiano</center>", unsafe_allow_html=True)
+
 st.write("---")
 st.caption("Nota: Este modelo considera degradación de paneles del 0.5% anual y beneficios de la Ley 1715.")
