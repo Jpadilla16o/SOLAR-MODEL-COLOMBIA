@@ -12,7 +12,7 @@ import plotly.graph_objects as go
     #</style>
     #""", unsafe_allow_html=True)
 
-st.set_page_config(page_title="SolarExpert Pro Colombia by Josejaime Padilla", layout="wide")
+st.set_page_config(page_title="SolarExpert Pro Colombia", layout="wide")
 
 # Estilo para forzar que las métricas se vean bien en modo claro y oscuro
 st.markdown("""
@@ -34,7 +34,7 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
-st.title("☀️ SolarExpert Pro: Ingeniería y Finanzas Solar")
+st.title("☀️ SolarExpert Pro by Josejaime Padilla")
 st.write("Herramienta de análisis técnico-financiero bajo Ley 1715 y CREG 174")
 
 with st.sidebar:
