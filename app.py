@@ -2,13 +2,35 @@ import streamlit as st
 import pandas as pd
 import plotly.graph_objects as go
 
-st.set_page_config(page_title="SolarExpert Pro Colombia", layout="wide")
+#st.set_page_config(page_title="SolarExpert Pro Colombia", layout="wide")
 
 # Estilo personalizado
+#st.markdown("""
+ #   <style>
+  #  .main { background-color: #f5f7f9; }
+   # .stMetric { background-color: #ffffff; padding: 15px; border-radius: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+    #</style>
+    #""", unsafe_allow_html=True)
+
+st.set_page_config(page_title="SolarExpert Pro Colombia", layout="wide")
+
+# Estilo para forzar que las métricas se vean bien en modo claro y oscuro
 st.markdown("""
     <style>
-    .main { background-color: #f5f7f9; }
-    .stMetric { background-color: #ffffff; padding: 15px; border-radius: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+    [data-testid="stMetricValue"] {
+        color: #1f77b4 !important;
+        font-size: 1.8rem !important;
+    }
+    [data-testid="stMetricLabel"] {
+        color: #555555 !important;
+        font-size: 1rem !important;
+    }
+    div[data-testid="stMetric"] {
+        background-color: #ffffff;
+        padding: 15px;
+        border-radius: 10px;
+        border: 1px solid #e0e0e0;
+    }
     </style>
     """, unsafe_allow_html=True)
 
