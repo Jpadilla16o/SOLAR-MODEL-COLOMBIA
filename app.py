@@ -85,6 +85,67 @@ fig.add_trace(go.Bar(x=list(range(11)), y=flujo, name="Flujo Acumulado",
 #fig.update_layout(title="Recuperación de la inversión en 10 años", ylabel="COP $")
 fig.update_layout(title="Recuperación de la inversión en 10 años", yaxis_title="COP $", xaxis_title="Años")
 st.plotly_chart(fig, use_container_width=True)
+# --- SECCIÓN TÉCNICA DE DISEÑO ---
+st.markdown("---")
+st.header("🛠️ Especificaciones Técnicas del Diseño")
+
+# 1. Definición de variables técnicas (Estándares 2026)
+potencia_panel_w = 550  # Watts por panel
+largo_panel = 2.27      # metros
+ancho_panel = 1.13      # metros
+area_panel = largo_panel * ancho_panel
+peso_panel = 28.5       # kg por panel
+
+# 2. Cálculos de dimensionamiento
+num_paneles = round((kwp_necesario * 1000) / potencia_panel_w + 0.5)
+area_total = num_paneles * area_panel
+peso_total = num_paneles * peso_panel
+
+# 3. Visualización de métricas técnicas
+t1, t2, t3 = st.columns(3)
+
+with t1:
+    st.metric("Número de Paneles", f"{num_paneles} unidades")
+    st.caption(f"Paneles de {potencia_panel_w}Wp")
+
+with t2:
+    st.metric("Área en Cubierta", f"{area_total:.1f} m²")
+    st.caption("Espacio mínimo requerido")
+
+with t3:
+    st.metric("Peso en Techo", f"{peso_total:.0f} kg")
+    st.caption("Carga sin estructura")
+
+
+
+# 4. Configuración Eléctrica Sugerida (Strings)
+st.subheader("⚡ Configuración Eléctrica")
+col_elec1, col_elec2 = st.columns(2)
+
+with col_elec1:
+    # Lógica simple de strings: máximo 12 paneles por serie (estándar común)
+    series = 1 if num_paneles <= 12 else 2
+    paneles_por_serie = round(num_paneles / series)
+    st.info(f"**Configuración de Strings:** {series} serie(s) de {paneles_por_serie} paneles.")
+    st.write("Esta configuración asegura entrar en el rango de MPPT del inversor.")
+
+with col_elec2:
+    tipo_conector = "MC4 Original"
+    calibre_cable = "10 AWG (6mm²)"
+    st.write(f"**Materiales Sugeridos:**")
+    st.write(f"- Conectores: {tipo_conector}")
+    st.write(f"- Cable Solar: {calibre_cable}")
+
+
+
+# 5. Gráfico de Balance Energético
+st.subheader("📊 Balance de Energía")
+labels = ['Autoconsumo Directo', 'Excedentes a la Red']
+values = [autoconsumo_directo, 100 - autoconsumo_directo]
+
+fig_pie = go.Figure(data=[go.Pie(labels=labels, values=values, hole=.3, marker_colors=['#2ca02c', '#1f77b4'])])
+fig_pie.update_layout(title_text="Uso de la Energía Producida")
+st.plotly_chart(fig_pie, use_container_width=True)
 
 st.write("---")
 st.caption("Nota: Este modelo considera degradación de paneles del 0.5% anual y beneficios de la Ley 1715.")
