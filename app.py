@@ -62,7 +62,7 @@ with tab1:
         st.caption("Predeterminado: 60%. Ajuste según el uso de electrodomésticos en el día.")
 #########################
 #######################
-st.divider()
+    st.divider()
     st.subheader("💾 Gestión del Proyecto")
     
     if st.button("Guardar y Registrar Proyecto"):
