@@ -5,7 +5,7 @@ import plotly.express as px  # Nueva librería para el Treemap
 import re
 
 # Configuración de página
-st.set_page_config(page_title="J3 SolarExpert Pro", layout="wide", page_icon="☀️")
+st.set_page_config(page_title="SolarCol Pro", layout="wide", page_icon="☀️")
 
 # --- BASE DE DATOS HSP ---
 hsp_data = {
@@ -26,7 +26,7 @@ def es_correo_valido(email):
 if 'registro_exitoso' not in st.session_state:
     st.session_state.registro_exitoso = False
 
-st.title("☀️ SolarExpert Pro by Josejaime Padilla")
+st.title("☀️ SolarCol Pro by Josejaime Padilla")
 st.markdown("---")
 
 tab1, tab2, tab3 = st.tabs(["📋 Datos del Proyecto", "🛠️ Diseño Técnico", "📊 Análisis Financiero"])
