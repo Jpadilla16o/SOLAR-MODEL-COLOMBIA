@@ -48,9 +48,21 @@ with tab1:
     st.divider()
     st.header("📍 Ubicación y Consumo")
     col1, col2 = st.columns(2)
+    
     with col1:
+        # 1. El usuario selecciona la ciudad
         ciudad = st.selectbox("Ubicación del Proyecto (Capital)", options=list(hsp_data.keys()))
+        
+        # 2. Obtenemos el valor de la base de datos
         hsp = hsp_data[ciudad]
+        
+        # 3. MOSTRAMOS EL DATO INMEDIATAMENTE si no es "Seleccionar"
+        if ciudad != "Seleccionar":
+            st.info(f"☀️ Horas Solares Pico (HSP) para **{ciudad}**: **{hsp} h/día**")
+            st.caption("Dato basado en promedios históricos IDEAM/UPME.")
+        else:
+            st.warning("Selecciona una ciudad para ver la radiación.")
+
     with col2:
         consumo_mes = st.number_input("Consumo Mensual Promedio (kWh)", value=300)
         tarifa_kwh = st.number_input("Costo del kWh factura ($ COP)", value=950)
