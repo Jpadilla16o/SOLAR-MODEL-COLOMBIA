@@ -188,7 +188,7 @@ if st.session_state.registro_exitoso:
         st.subheader("🌿 Impacto Ambiental")
         ia1, ia2, ia3 = st.columns(3)
         ia1.metric("CO2 Evitado", f"{co2_evitado_anual:,.1f} kg/año")
-        ia2.metric("Árboles equiv.", f"{arboles_equivalentes:.0f} Und")
+        ia2.metric("Árboles equiv.", f"{arboles_equivalentes:.0f} árboles")
         ia3.metric("Generación Anual", f"{gen_anual:,.0f} kWh")
 
         st.divider()
