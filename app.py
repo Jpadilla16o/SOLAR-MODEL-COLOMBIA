@@ -80,7 +80,7 @@ with tab1:
     st.header("⚖️ Configuración Adicional")
     c_a, c_b = st.columns(2)
     with c_a:
-        st.write("**¿Declara Renta? (Ley 1715)**")
+        st.write("**¿Es usted declarante de renta? (Ley 1715)**")
         seleccion_renta = st.radio(
             "Seleccione:",
             ["Sí, soy declarante", "No declaro renta"],
