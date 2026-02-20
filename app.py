@@ -84,6 +84,7 @@ with tab1:
         seleccion_renta = st.radio(
             "Seleccione:",
             ["Sí, soy declarante", "No declaro renta"],
+            index=1,
             horizontal=True,
             label_visibility="collapsed"
         )
