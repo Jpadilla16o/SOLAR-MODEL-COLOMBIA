@@ -147,4 +147,15 @@ if st.session_state.registro_exitoso:
 
         st.subheader("📉 Comparativa de Factura Mensual")
         factura_actual = consumo_mes * tarifa_kwh
-        nueva_factura =
+        nueva_factura = factura_actual - (ahorro_energia_anual / 12)
+        
+        fig_f = go.Figure(data=[
+            go.Bar(name='Factura Actual', x=['Escenario'], y=[factura_actual], marker_color='#E74C3C'),
+            go.Bar(name='Con Energía Solar', x=['Escenario'], y=[nueva_factura], marker_color='#2ECC71')
+        ])
+        fig_f.update_layout(barmode='group', yaxis_title="Costo Mensual (COP $)")
+        st.plotly_chart(fig_f, use_container_width=True)
+
+else:
+    with tab2: st.warning("🔒 Registra tus datos en la Capa 1 para ver el diseño técnico.")
+    with tab3: st.warning("🔒 Registra tus datos en la Capa 1 para ver el análisis financiero.")
