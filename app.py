@@ -95,7 +95,8 @@ with tab1:
             st.caption("ℹ️ *Análisis basado únicamente en ahorro energético.*")
 
     with c_b:
-        autoconsumo_directo = st.slider("% Autoconsumo directo", 0, 100, 60)
+        # Dejado en 95% como estándar inicial solicitado
+        autoconsumo_directo = st.slider("% Autoconsumo (Ahorro 1 a 1)", 0, 100, 95)
 
     st.divider()
     if st.button("💾 Guardar y Registrar Proyecto", use_container_width=True, type="primary"):
@@ -107,34 +108,25 @@ with tab1:
             st.balloons()
             st.success("✅ Registro exitoso. Resultados desbloqueados.")
 
-# --- LÓGICA DE CÁLCULO ACTUALIZADA (PRECIOS POR ESCALA REALISTA) ---
+# --- LÓGICA DE CÁLCULO ---
 if st.session_state.registro_exitoso:
     eficiencia = 0.80
     kwp_teorico = (consumo_mes / 30) / (hsp * eficiencia)
     
-    # 1. Determinamos número de paneles
     potencia_panel = 550
     num_paneles = math.ceil((kwp_teorico * 1000) / potencia_panel)
-    
-    # 2. CAPACIDAD REAL INSTALADA
     kwp_instalado = (num_paneles * potencia_panel) / 1000
     
-    # 3. NUEVA ESTRUCTURA DE PRECIOS (Protegiendo márgenes en proyectos pequeños)
+    # Estructura de costos protegida
     if kwp_instalado <= 3.5:
-        # Para micro-proyectos, usamos un costo base alto por los fijos (trámites, ingeniería, logística)
-        # Esto nos acerca a los 20-22 millones que mencionas para sistemas de ~3kWp
         inversion_total = 12000000 + (kwp_instalado * 3200000)
     elif 3.5 < kwp_instalado <= 10:
-        # Proyectos residenciales medianos
         inversion_total = kwp_instalado * 6400000
     elif 10 < kwp_instalado <= 50:
-        # Proyectos comerciales
         inversion_total = kwp_instalado * 4900000
     else:
-        # Proyectos industriales
         inversion_total = kwp_instalado * 3900000
 
-    # Ingeniería Detallada
     area_neta_paneles = num_paneles * 2.6
     area_mantenimiento = area_neta_paneles * 0.15
     area_total_estimada = area_neta_paneles + area_mantenimiento
@@ -143,10 +135,14 @@ if st.session_state.registro_exitoso:
     peso_diseno_seguridad = peso_nominal * 1.2
     carga_distribuida = peso_diseno_seguridad / area_neta_paneles
     
-    # Finanzas
+    # Finanzas (Considerando esquema de medición neta casi 1 a 1)
     gen_anual = kwp_instalado * hsp * eficiencia * 365
+    
+    # El slider ahora actúa como un factor de ajuste de eficiencia económica
+    # 95-100% es ahorro pleno. Valores menores castigan el excedente.
+    factor_remuneracion_excedente = 0.75 # Ajustado un poco más alto para Colombia
     ahorro_energia_anual = (gen_anual * (autoconsumo_directo/100) * tarifa_kwh) + \
-                           (gen_anual * (1 - autoconsumo_directo/100) * tarifa_kwh * 0.6)
+                           (gen_anual * (1 - autoconsumo_directo/100) * tarifa_kwh * factor_remuneracion_excedente)
     
     beneficio_anual_renta = (inversion_total * 0.5 * 0.35) / 5 if aplica_ley_1715 else 0
     ahorro_total_anual = ahorro_energia_anual + beneficio_anual_renta
@@ -200,14 +196,13 @@ if st.session_state.registro_exitoso:
         ia3.metric("Generación Anual", f"{gen_anual:,.0f} kWh")
 
         st.divider()
-        datos_pdf = {
+        pdf_bytes = generar_pdf({
             "Cliente": nombre_cliente,
             "Ciudad": ciudad,
             "Capacidad": f"{kwp_instalado:.2f} kWp",
             "Inversión": f"${inversion_total:,.0f} COP",
             "Payback": f"{payback:.1f} años"
-        }
-        pdf_bytes = generar_pdf(datos_pdf)
+        })
         st.download_button(label="📄 Descargar Propuesta en PDF", data=pdf_bytes, file_name=f"Propuesta_{nombre_cliente}.pdf", mime="application/pdf", use_container_width=True)
 
 else:
