@@ -80,7 +80,7 @@ with tab1:
                 "HSP": hsp,
                 "Inversión Est": inversion_total if 'inversion_total' in locals() else 0
             }
-            st.json(datos_prospecto) # Esto le muestra al desarrollador qué datos estamos listos para enviar
+           ####################################### st.json(datos_prospecto) # Esto le muestra al desarrollador qué datos estamos listos para enviar
 #######################
 #########################
 
