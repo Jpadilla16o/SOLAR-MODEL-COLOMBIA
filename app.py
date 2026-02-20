@@ -60,6 +60,29 @@ with tab1:
     with c_b:
         autoconsumo_directo = st.slider("% Autoconsumo (Uso directo del sol)", 0, 100, 60)
         st.caption("Predeterminado: 60%. Ajuste según el uso de electrodomésticos en el día.")
+#########################
+#######################
+st.divider()
+    st.subheader("💾 Gestión del Proyecto")
+    
+    if st.button("Guardar y Registrar Proyecto"):
+        if ciudad == "Seleccionar" or nombre_cliente == "":
+            st.error("❌ Por favor completa el nombre y la ciudad antes de guardar.")
+        else:
+            # Aquí es donde en el futuro conectaremos la base de datos
+            st.success(f"✅ ¡Proyecto de {nombre_cliente} guardado exitosamente!")
+            
+            # Simulamos el almacenamiento en un diccionario/JSON
+            datos_prospecto = {
+                "Nombre": nombre_cliente,
+                "Ciudad": ciudad,
+                "Consumo": consumo_mes,
+                "HSP": hsp,
+                "Inversión Est": inversion_total if 'inversion_total' in locals() else 0
+            }
+            st.json(datos_prospecto) # Esto le muestra al desarrollador qué datos estamos listos para enviar
+#######################
+#########################
 
 # --- CÁLCULOS MOTOR (Background) ---
 if ciudad != "Seleccionar" and hsp > 0:
