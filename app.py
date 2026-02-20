@@ -232,5 +232,5 @@ if st.session_state.registro_exitoso:
         )
 
 else:
-    with tab2: st.warning("🔒 Registra los datos del proyecto en la Capa 1 para ver el diseño técnico.")
-    with tab3: st.warning("🔒 Registra los datos del proyecto en la Capa 1 para ver el análisis financiero.")
+    with tab2: st.warning("🔒 Registra los datos del proyecto para ver el diseño técnico.")
+    with tab3: st.warning("🔒 Registra los datos del proyecto para ver el análisis financiero.")
