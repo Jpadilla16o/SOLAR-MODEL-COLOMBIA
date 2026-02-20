@@ -92,10 +92,10 @@ if st.session_state.registro_exitoso:
     kwp_necesario = (consumo_mes / 30) / (hsp * eficiencia)
     
     # Precios escalonados
-    if kwp_necesario < 3: costo_kwp = 6000000
-    elif 3 <= kwp_necesario < 15: costo_kwp = 4600000
-    elif 15 <= kwp_necesario < 100: costo_kwp = 3750000
-    else: costo_kwp = 3200000
+    if kwp_necesario < 3: costo_kwp = 6500000
+    elif 3 <= kwp_necesario < 15: costo_kwp = 5000000
+    elif 15 <= kwp_necesario < 100: costo_kwp = 4000000
+    else: costo_kwp = 3800000
 
     # Ingeniería Detallada
     potencia_panel = 550
