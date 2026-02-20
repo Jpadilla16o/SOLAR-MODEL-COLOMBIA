@@ -24,13 +24,23 @@ st.title("☀️ SolarExpert Pro: Colombia")
 tab1, tab2, tab3 = st.tabs(["📋 Datos del Proyecto", "📊 Análisis Financiero", "🛠️ Diseño Técnico"])
 
 with tab1:
-    st.header("Información Básica")
+    st.header("👤 Información de Contacto")
+    # Nueva fila para datos personales
+    c_nom, c_mail, c_tel = st.columns([2, 2, 1])
+    
+    with c_nom:
+        nombre_cliente = st.text_input("Nombre del Cotizante", placeholder="Ej: Juan Pérez")
+    with c_mail:
+        correo_cliente = st.text_input("Correo Electrónico", placeholder="juan@ejemplo.com")
+    with c_tel:
+        telefono_cliente = st.text_input("WhatsApp / Celular", placeholder="300 123 4567")
+
+    st.divider()
+    st.header("📍 Ubicación y Consumo")
     col1, col2 = st.columns(2)
     
     with col1:
-        nombre_cliente = st.text_input("Nombre del Cotizante", placeholder="Ej: Juan Pérez")
         ciudad = st.selectbox("Ubicación del Proyecto (Capital)", options=list(hsp_data.keys()))
-        
         if ciudad != "Seleccionar":
             st.info(f"📍 Horas Solares Pico (HSP) detectadas: **{hsp_data[ciudad]} h/día**")
             hsp = hsp_data[ciudad]
@@ -39,7 +49,6 @@ with tab1:
 
     with col2:
         metodo_consumo = st.radio("¿Cómo ingresarás el consumo?", ["Promedio Directo", "Detalle mes a mes"])
-        
         if metodo_consumo == "Promedio Directo":
             consumo_mes = st.number_input("Consumo Mensual Promedio (kWh)", value=300)
         else:
@@ -49,54 +58,48 @@ with tab1:
                 st.write(f"**Promedio calculado: {consumo_mes:.1f} kWh/mes**")
 
     st.divider()
-    st.header("Configuración de Tarifas y Uso")
+    st.header("⚙️ Configuración Económica")
     c_a, c_b = st.columns(2)
     
     with c_a:
         tarifa_kwh = st.number_input("Costo del kWh según factura ($ COP)", value=950)
-        # Costo por vatio oculto al usuario final pero usado en cálculos
-        costo_vatio = 4500 
+        costo_vatio = 4500 # Valor interno para cálculos financieros
     
     with c_b:
         autoconsumo_directo = st.slider("% Autoconsumo (Uso directo del sol)", 0, 100, 60)
-        st.caption("Predeterminado: 60%. Ajuste según el uso de electrodomésticos en el día.")
-#########################
-#######################
+        st.caption("Predeterminado: 60%. Energía que consumes mientras hay sol.")
+
     st.divider()
     st.subheader("💾 Gestión del Proyecto")
     
     if st.button("Guardar y Registrar Proyecto"):
-        if ciudad == "Seleccionar" or nombre_cliente == "":
-            st.error("❌ Por favor completa el nombre y la ciudad antes de guardar.")
+        # Validación de campos obligatorios
+        if ciudad == "Seleccionar" or nombre_cliente == "" or correo_cliente == "":
+            st.error("❌ Por favor completa Nombre, Correo y Ciudad antes de guardar.")
         else:
-            # Aquí es donde en el futuro conectaremos la base de datos
+            st.balloons()
             st.success(f"✅ ¡Proyecto de {nombre_cliente} guardado exitosamente!")
-            
-            # Simulamos el almacenamiento en un diccionario/JSON
-            datos_prospecto = {
-                "Nombre": nombre_cliente,
-                "Ciudad": ciudad,
-                "Consumo": consumo_mes,
-                "HSP": hsp,
-                "Inversión Est": inversion_total if 'inversion_total' in locals() else 0
-            }
-           ####################################### st.json(datos_prospecto) # Esto le muestra al desarrollador qué datos estamos listos para enviar
-#######################
-#########################
+            # Aquí quedan listos los datos para tu futura base de datos
+            st.write(f"Registro: {correo_cliente} | {telefono_cliente} | {ciudad}")
 
-# --- CÁLCULOS MOTOR (Background) ---
+# --- CÁLCULOS MOTOR ---
 if ciudad != "Seleccionar" and hsp > 0:
+    # Ingeniería básica
     eficiencia = 0.80
-    energia_dia_necesaria = consumo_mes / 30
-    kwp_necesario = energia_dia_necesaria / (hsp * eficiencia)
+    kwp_necesario = (consumo_mes / 30) / (hsp * eficiencia)
+    inversion_total = (kwp_necesario * 1000) * costo_vatio
     
-    # Datos para las siguientes capas... (Solo se activan si hay ciudad seleccionada)
     with tab2:
-        st.warning("Selecciona una ciudad en la Capa 1 para ver el análisis.") if ciudad == "Seleccionar" else st.write(f"Análisis Financiero para {nombre_cliente}...")
-        # Aquí iría tu código de barras de retorno y métricas financieras
+        st.header(f"📊 Análisis Financiero: {nombre_cliente}")
+        # Aquí puedes añadir el gráfico de barras que hicimos antes
+        st.write("Cálculos procesados. Listo para mostrar ROI y flujo de caja.")
         
     with tab3:
-        st.warning("Selecciona una ciudad en la Capa 1 para ver el diseño.") if ciudad == "Seleccionar" else st.write("Especificaciones Técnicas...")
-        # Aquí iría tu código de paneles, área y strings
+        st.header("🛠️ Especificaciones Técnicas")
+        # Aquí irá el número de paneles, área y configuración de strings
+        st.write(f"Sistema sugerido: **{kwp_necesario:.2f} kWp**")
 else:
-    st.info("👈 Por favor, completa la **Capa 1** para generar el diseño.")
+    with tab2:
+        st.info("👈 Por favor, completa la **Capa 1** para ver el análisis financiero.")
+    with tab3:
+        st.info("👈 Por favor, completa la **Capa 1** para ver el diseño técnico.")
