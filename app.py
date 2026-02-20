@@ -4,7 +4,7 @@ import plotly.graph_objects as go
 import plotly.express as px
 import re
 import math
-#from fpdf import FPDF
+from fpdf import FPDF
 import base64
 
 # Configuración de página
@@ -69,7 +69,6 @@ with tab1:
         hsp = hsp_data[ciudad]
         if ciudad != "Seleccionar":
             st.info(f"☀️ Horas Solares Pico (HSP) para **{ciudad}**: **{hsp} h/día**")
-            st.caption("Dato basado en promedios históricos IDEAM/UPME.")
         else:
             st.warning("Selecciona una ciudad para ver la radiación.")
 
@@ -81,12 +80,22 @@ with tab1:
     st.header("⚖️ Configuración Adicional")
     c_a, c_b = st.columns(2)
     with c_a:
-        aplica_ley_1715 = st.checkbox("¿Es declarante de Renta? (Ley 1715)", value=True)
+        st.write("**¿Declara Renta? (Ley 1715)**")
+        seleccion_renta = st.radio(
+            "Seleccione:",
+            ["Sí, soy declarante", "No declaro renta"],
+            horizontal=True,
+            label_visibility="collapsed"
+        )
+        aplica_ley_1715 = True if seleccion_renta == "Sí, soy declarante" else False
+        if aplica_ley_1715:
+            st.caption("✨ *Incluye incentivos fiscales en el ahorro.*")
+
     with c_b:
-        autoconsumo_directo = st.slider("% Autoconsumo", 0, 100, 60)
+        autoconsumo_directo = st.slider("% Autoconsumo directo", 0, 100, 60)
 
     st.divider()
-    if st.button("💾 Guardar y Registrar Proyecto"):
+    if st.button("💾 Guardar y Registrar Proyecto", use_container_width=True, type="primary"):
         if not nombre_cliente or not es_correo_valido(correo_cliente) or len(telefono_cliente) < 10 or ciudad == "Seleccionar":
             st.error("❌ Por favor completa todos los campos correctamente.")
             st.session_state.registro_exitoso = False
@@ -97,17 +106,14 @@ with tab1:
 
 # --- LÓGICA DE CÁLCULO Y RESULTADOS ---
 if st.session_state.registro_exitoso:
-    # MOTOR DE CÁLCULO
     eficiencia = 0.80
     kwp_necesario = (consumo_mes / 30) / (hsp * eficiencia)
     
-    # Precios escalonados
     if kwp_necesario < 3: costo_kwp = 6500000
     elif 3 <= kwp_necesario < 15: costo_kwp = 5000000
     elif 15 <= kwp_necesario < 100: costo_kwp = 4000000
     else: costo_kwp = 3800000
 
-    # Ingeniería Detallada (Actualizada con math.ceil)
     potencia_panel = 550
     num_paneles = math.ceil((kwp_necesario * 1000) / potencia_panel)
     
@@ -115,21 +121,19 @@ if st.session_state.registro_exitoso:
     area_mantenimiento = area_neta_paneles * 0.15
     area_total_estimada = area_neta_paneles + area_mantenimiento
     
-    # Peso con Factor de Seguridad del 20%
     peso_nominal = num_paneles * 28
     peso_diseno_seguridad = peso_nominal * 1.2
     carga_distribuida = peso_diseno_seguridad / area_neta_paneles
     
-    # Finanzas Detalladas
     inversion_total = kwp_necesario * costo_kwp
     gen_anual = kwp_necesario * hsp * eficiencia * 365
     ahorro_energia_anual = (gen_anual * (autoconsumo_directo/100) * tarifa_kwh) + \
                            (gen_anual * (1 - autoconsumo_directo/100) * tarifa_kwh * 0.6)
+    
     beneficio_anual_renta = (inversion_total * 0.5 * 0.35) / 5 if aplica_ley_1715 else 0
     ahorro_total_anual = ahorro_energia_anual + beneficio_anual_renta
     payback = inversion_total / ahorro_total_anual
 
-    # Impacto Ambiental (Nuevos Cálculos)
     co2_evitado_anual = gen_anual * 0.126 
     arboles_equivalentes = co2_evitado_anual / 20
 
@@ -138,11 +142,9 @@ if st.session_state.registro_exitoso:
         t1, t2, t3 = st.columns(3)
         t1.metric("Capacidad Total", f"{kwp_necesario:.2f} kWp")
         t2.metric("Paneles Necesarios", f"{num_paneles} Und", f"{potencia_panel}Wp")
-        t3.metric("Espacio Requerido", f"{area_total_estimada:.1f} m²", help="Incluye 15% de área de mantenimiento.")
+        t3.metric("Espacio Requerido", f"{area_total_estimada:.1f} m²")
         
         st.divider()
-
-        # --- GRÁFICO DINÁMICO DE DISTRIBUCIÓN ---
         st.subheader("📐 Distribución de Espacio Sugerida")
         df_espacio = pd.DataFrame({
             "Categoría": ["Paneles (Generación)", "Pasillos (Mantenimiento)"],
@@ -161,75 +163,36 @@ if st.session_state.registro_exitoso:
         col_ta, col_tb = st.columns(2)
         with col_ta:
             st.subheader("⚡ Componentes")
-            st.markdown(f"""
-            - **Inversor Sugerido:** {"Monofásico" if kwp_necesario < 8 else "Trifásico"} de {kwp_necesario:.1f} kW.
-            - **Tecnología:** Módulos Tier 1 Monocristalinos N-Type.
-            - **Estructura:** Aluminio anodizado 6005-T5.
-            """)
+            st.markdown(f"- **Inversor:** {'Monofásico' if kwp_necesario < 8 else 'Trifásico'} de {kwp_necesario:.1f} kW.\n- **Tecnología:** Módulos Tier 1 N-Type.\n- **Estructura:** Aluminio anodizado.")
         with col_tb:
-            st.subheader("🏗️ Detalles de Carga y Seguridad")
-            st.markdown(f"""
-            - **Peso Total (con FS 20%):** ~{peso_diseno_seguridad:.0f} kg.
-            - **Carga Distribuida:** {carga_distribuida:.2f} kg/m².
-            - **Certificaciones:** RETIE / IEC 61215.
-            - **Garantía Inversor:** 10-12 años.
-            """)
+            st.subheader("🏗️ Carga y Seguridad")
+            st.markdown(f"- **Peso Total (FS 20%):** ~{peso_diseno_seguridad:.0f} kg.\n- **Carga Distribuida:** {carga_distribuida:.2f} kg/m².\n- **Normativa:** RETIE / IEC 61215.")
 
     with tab3:
         st.header(f"💰 Rentabilidad Económica: {nombre_cliente}")
         f1, f2, f3 = st.columns(3)
         f1.metric("Inversión Total", f"${inversion_total:,.0f} COP")
-        f2.metric("Ahorro Anual (Energía+Renta)", f"${ahorro_total_anual:,.0f} COP")
-        f3.metric("Tiempo de Retorno", f"{payback:.1f} Años")
+        f2.metric("Ahorro Anual", f"${ahorro_total_anual:,.0f} COP")
+        f3.metric("Payback", f"{payback:.1f} Años")
         
         st.divider()
-        st.subheader("📈 Proyección de Flujo de Caja (10 años)")
+        st.subheader("📈 Flujo de Caja (10 años)")
         años = list(range(0, 11))
         flujo = [-inversion_total]
         for a in años[1:]: flujo.append(flujo[-1] + ahorro_total_anual)
-        
         fig_p = go.Figure(data=[go.Bar(x=años, y=flujo, marker_color=['#E74C3C' if v < 0 else '#2ECC71' for v in flujo])])
-        fig_p.update_layout(yaxis_title="Flujo Acumulado (COP $)", xaxis_title="Años")
         st.plotly_chart(fig_p, use_container_width=True)
         
-        st.subheader("📉 Comparativa de Factura Mensual")
-        factura_actual = consumo_mes * tarifa_kwh
-        nueva_factura = factura_actual - (ahorro_energia_anual / 12)
-        
-        fig_f = go.Figure(data=[
-            go.Bar(name='Factura Actual', x=['Escenario'], y=[factura_actual], marker_color='#E74C3C'),
-            go.Bar(name='Con Energía Solar', x=['Escenario'], y=[nueva_factura], marker_color='#2ECC71')
-        ])
-        fig_f.update_layout(barmode='group', yaxis_title="Costo Mensual (COP $)")
-        st.plotly_chart(fig_f, use_container_width=True)
-
-        # --- SECCIÓN DE IMPACTO AMBIENTAL ---
         st.divider()
-        st.subheader("🌿 Impacto Ambiental Estimado")
+        st.subheader("🌿 Impacto Ambiental")
         ia1, ia2, ia3 = st.columns(3)
-        ia1.metric("CO2 Evitado", f"{co2_evitado_anual:,.1f} kg/año", "♻️")
-        ia2.metric("Árboles equiv.", f"{arboles_equivalentes:.0f} Und", "🌳")
-        ia3.metric("Gen. Limpia", f"{gen_anual:,.0f} kWh/año", "☀️")
+        ia1.metric("CO2 Evitado", f"{co2_evitado_anual:,.1f} kg/año")
+        ia2.metric("Árboles equiv.", f"{arboles_equivalentes:.0f} Und")
+        ia3.metric("Generación Anual", f"{gen_anual:,.0f} kWh")
 
-        # --- EXPORTACIÓN A PDF ---
         st.divider()
-        datos_pdf = {
-            "Cliente": nombre_cliente,
-            "Ciudad": ciudad,
-            "Capacidad Sistema": f"{kwp_necesario:.2f} kWp",
-            "Número de Paneles": num_paneles,
-            "Inversión Estimada": f"${inversion_total:,.0f} COP",
-            "Payback": f"{payback:.1f} años",
-            "CO2 evitado": f"{co2_evitado_anual:.1f} kg/año"
-        }
-        
-        pdf_bytes = generar_pdf(datos_pdf)
-        st.download_button(
-            label="📄 Descargar Propuesta en PDF",
-            data=pdf_bytes,
-            file_name=f"Propuesta_Solar_{nombre_cliente.replace(' ', '_')}.pdf",
-            mime="application/pdf"
-        )
+        pdf_bytes = generar_pdf({"Cliente": nombre_cliente, "Ciudad": ciudad, "Inversión": f"${inversion_total:,.0f} COP", "Payback": f"{payback:.1f} años"})
+        st.download_button(label="📄 Descargar Propuesta en PDF", data=pdf_bytes, file_name=f"Propuesta_{nombre_cliente}.pdf", mime="application/pdf", use_container_width=True)
 
 else:
     with tab2: st.warning("🔒 Registra los datos del proyecto para ver el diseño técnico.")
