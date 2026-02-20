@@ -4,7 +4,7 @@ import plotly.graph_objects as go
 import plotly.express as px
 import re
 import math
-#from fpdf import FPDF
+from fpdf import FPDF
 import base64
 
 # Configuración de página
