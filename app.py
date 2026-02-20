@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import plotly.graph_objects as go
+import plotly.express as px  # Nueva librería para el Treemap
 import re
 
 # Configuración de página
@@ -50,13 +51,8 @@ with tab1:
     col1, col2 = st.columns(2)
     
     with col1:
-        # 1. El usuario selecciona la ciudad
         ciudad = st.selectbox("Ubicación del Proyecto (Capital)", options=list(hsp_data.keys()))
-        
-        # 2. Obtenemos el valor de la base de datos
         hsp = hsp_data[ciudad]
-        
-        # 3. MOSTRAMOS EL DATO INMEDIATAMENTE si no es "Seleccionar"
         if ciudad != "Seleccionar":
             st.info(f"☀️ Horas Solares Pico (HSP) para **{ciudad}**: **{hsp} h/día**")
             st.caption("Dato basado en promedios históricos IDEAM/UPME.")
@@ -97,11 +93,18 @@ if st.session_state.registro_exitoso:
     elif 15 <= kwp_necesario < 100: costo_kwp = 4000000
     else: costo_kwp = 3800000
 
-    # Ingeniería Detallada
+    # Ingeniería Detallada (Actualizada con FS y Áreas de MTTO)
     potencia_panel = 550
     num_paneles = round((kwp_necesario * 1000) / potencia_panel + 0.5)
-    area_estimada = num_paneles * 2.6 * 1.15
-    peso_estimado = num_paneles * 28 * 1.2
+    
+    area_neta_paneles = num_paneles * 2.6
+    area_mantenimiento = area_neta_paneles * 0.15
+    area_total_estimada = area_neta_paneles + area_mantenimiento
+    
+    # Peso con Factor de Seguridad del 20%
+    peso_nominal = num_paneles * 28
+    peso_diseno_seguridad = peso_nominal * 1.2
+    carga_distribuida = peso_diseno_seguridad / area_neta_paneles
     
     # Finanzas Detalladas
     inversion_total = kwp_necesario * costo_kwp
@@ -117,10 +120,25 @@ if st.session_state.registro_exitoso:
         t1, t2, t3 = st.columns(3)
         t1.metric("Capacidad Total", f"{kwp_necesario:.2f} kWp")
         t2.metric("Paneles Necesarios", f"{num_paneles} Und", f"{potencia_panel}Wp")
-        t3.metric("Espacio en Techo", f"{area_estimada:.1f} m²")
+        t3.metric("Espacio Requerido", f"{area_total_estimada:.1f} m²", help="Incluye 15% de área de mantenimiento.")
         
-        
-        
+        st.divider()
+
+        # --- GRÁFICO DINÁMICO DE DISTRIBUCIÓN ---
+        st.subheader("📐 Distribución de Espacio Sugerida")
+        df_espacio = pd.DataFrame({
+            "Categoría": ["Paneles (Generación)", "Pasillos (Mantenimiento)"],
+            "Padre": ["Área Total", "Área Total"],
+            "Metros": [area_neta_paneles, area_mantenimiento]
+        })
+        fig_area = px.treemap(
+            df_espacio, path=["Padre", "Categoría"], values="Metros",
+            color="Categoría", color_discrete_map={"Paneles (Generación)": "#1f77b4", "Pasillos (Mantenimiento)": "#a6cee3"}
+        )
+        fig_area.update_traces(textinfo="label+value", texttemplate="%{label}<br>%{value:.1f} m²")
+        fig_area.update_layout(margin=dict(t=0, l=0, r=0, b=0), height=300)
+        st.plotly_chart(fig_area, use_container_width=True)
+
         st.divider()
         col_ta, col_tb = st.columns(2)
         with col_ta:
@@ -131,9 +149,10 @@ if st.session_state.registro_exitoso:
             - **Estructura:** Aluminio anodizado 6005-T5.
             """)
         with col_tb:
-            st.subheader("🏗️ Detalles de Carga")
+            st.subheader("🏗️ Detalles de Carga y Seguridad")
             st.markdown(f"""
-            - **Peso en Cubierta:** ~{peso_estimado:.0f} kg.
+            - **Peso Total (con FS 20%):** ~{peso_diseno_seguridad:.0f} kg.
+            - **Carga Distribuida:** {carga_distribuida:.2f} kg/m².
             - **Certificaciones:** RETIE / IEC 61215.
             - **Garantía Inversor:** 10-12 años.
             """)
@@ -155,8 +174,6 @@ if st.session_state.registro_exitoso:
         fig_p.update_layout(yaxis_title="Flujo Acumulado (COP $)", xaxis_title="Años")
         st.plotly_chart(fig_p, use_container_width=True)
         
-        
-
         st.subheader("📉 Comparativa de Factura Mensual")
         factura_actual = consumo_mes * tarifa_kwh
         nueva_factura = factura_actual - (ahorro_energia_anual / 12)
@@ -169,5 +186,5 @@ if st.session_state.registro_exitoso:
         st.plotly_chart(fig_f, use_container_width=True)
 
 else:
-    with tab2: st.warning("🔒 Registra los datos del proyecto para ver el diseño técnico.")
-    with tab3: st.warning("🔒 Registra los datos del proyecto para ver el análisis financiero.")
+    with tab2: st.warning("🔒 Registra los datos del proyecto en la Capa 1 para ver el diseño técnico.")
+    with tab3: st.warning("🔒 Registra los datos del proyecto en la Capa 1 para ver el análisis financiero.")
