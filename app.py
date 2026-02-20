@@ -101,7 +101,7 @@ if st.session_state.registro_exitoso:
     potencia_panel = 550
     num_paneles = round((kwp_necesario * 1000) / potencia_panel + 0.5)
     area_estimada = num_paneles * 2.6
-    peso_estimado = num_paneles * 28
+    peso_estimado = num_paneles * 28 * 1.2
     
     # Finanzas Detalladas
     inversion_total = kwp_necesario * costo_kwp
