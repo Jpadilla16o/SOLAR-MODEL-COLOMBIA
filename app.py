@@ -21,7 +21,7 @@ st.markdown("<style>div[data-testid='stMetricValue'] { color: #f39c12; }</style>
 st.title("☀️ SolarExpert Pro: Colombia")
 
 # --- CREACIÓN DE CAPAS (TABS) ---
-tab1, tab2, tab3 = st.tabs(["📋 Capa 1: Datos del Proyecto", "📊 Capa 2: Análisis Financiero", "🛠️ Capa 3: Diseño Técnico"])
+tab1, tab2, tab3 = st.tabs(["📋 Datos del Proyecto", "📊 Análisis Financiero", "🛠️ Diseño Técnico"])
 
 with tab1:
     st.header("Información Básica")
